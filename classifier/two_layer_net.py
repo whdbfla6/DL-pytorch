@@ -55,7 +55,7 @@ class TwoNeuralNet:
         loss = -torch.log(prob)
         loss = torch.sum(loss[range(N),y])/N + reg*torch.sum(torch.mul(W1,W1)) + reg*torch.sum(torch.mul(W2,W2))
 
-        prob[range(N),y] -= 1
+        prob[range(N),y] -= 1.0
 
         self.grads = {}
         self.grads['W2'] = torch.mm(hidden.T,prob)/N + 2*reg*W2
@@ -88,8 +88,9 @@ class TwoNeuralNet:
                 print(f'[{i}/{num_iters}] training loss : {loss}')
                 val_loss = self.nn_forward_backward(X_val,y_val,reg)
                 print(f'[{i}/{num_iters}] validation loss : {val_loss}')
+                learning_rate *= learning_rate_decay
             for param in self.params:
-                self.params[param] -= learning_rate*self.grads[param]
+                self.params[param] = self.params[param] - learning_rate*self.grads[param]
 
     def pred(
         self,
