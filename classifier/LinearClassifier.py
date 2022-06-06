@@ -17,9 +17,8 @@ class LinearClassifier:
         if self.W == None: self.W = torch.rand((c,num_class))*0.001
         
         for _ in range(num_iters):
-            out = torch.mm(X,self.W)
-            loss,dW = self.loss(X,y,out,reg)
-            self.W -= dW
+            loss,dW = self.loss(X,y,reg)
+            self.W -= lr*dW
 
     def pred(
         self,
@@ -37,10 +36,10 @@ class LinearSVM(LinearClassifier):
         self,
         X,
         y,
-        out,
         reg : float = 1e-5,
         ):
 
+        out = torch.mm(X,self.W)
         n,c = out.shape
         sy = out[range(n),y].reshape((-1,1)).expand((-1,c))
 
@@ -63,9 +62,10 @@ class Softmax(LinearClassifier):
         self,
         X,
         y,
-        out,
         reg : float = 1e-5,
         ):
+
+        out = torch.mm(X,self.W)
         n,c = out.shape
         out_ex = torch.exp(out)
         den = torch.sum(out_ex,dim=1).reshape((-1,1)).expand((-1,c))
